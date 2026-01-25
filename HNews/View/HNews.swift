@@ -40,25 +40,22 @@ struct HNews: View {
                     }
                 }
             }
-            .navigationTitle(newsViewModel.isLoading || newsViewModel.errorMessage != nil ? "" : "")
             .toolbarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .principal) {
-                    if !newsViewModel.isLoading && newsViewModel.errorMessage == nil {
-                        HStack(spacing: 8) {
-                            Image(systemName: "newspaper.fill")
-                                .font(.system(size: 20, weight: .semibold))
-                                .foregroundStyle(
-                                    LinearGradient(
-                                        colors: [Color.accentColor, Color.accentColor.opacity(0.7)],
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    )
+                    HStack(spacing: 8) {
+                        Image(systemName: "newspaper.fill")
+                            .font(.system(size: 20, weight: .semibold))
+                            .foregroundStyle(
+                                LinearGradient(
+                                    colors: [Color.accentColor, Color.accentColor.opacity(0.7)],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
                                 )
-                            Text("H News")
-                                .font(.system(size: 28, weight: .bold, design: .rounded))
-                                .foregroundStyle(.primary)
-                        }
+                            )
+                        Text("H News")
+                            .font(.system(size: 28, weight: .bold, design: .rounded))
+                            .foregroundStyle(.primary)
                     }
                 }
                 ToolbarItem(placement: .topBarLeading) {
@@ -68,7 +65,9 @@ struct HNews: View {
                         Image(systemName: "arrow.clockwise")
                             .font(.system(size: 16, weight: .medium))
                             .foregroundStyle(.primary)
+                            .opacity(newsViewModel.isLoading ? 0.5 : 1)
                     }
+                    .disabled(newsViewModel.isLoading)
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     NavigationLink {
