@@ -38,7 +38,11 @@ struct SettingsView: View {
             } header: {
                 Text("Appearance")
             } footer: {
-                Text(settingsViewModel.backgroundEnabled ? "Choose the background color for the app" : "Enable custom background color to change the app background")
+                Text(
+                    settingsViewModel.backgroundEnabled
+                    ? "Choose the background color for the app"
+                    : "Enable custom background color to change the app background"
+                )
             }
             
             Section {
@@ -48,7 +52,7 @@ struct SettingsView: View {
                     }
                 }
             } header: {
-                Text("Date Param")
+                Text("Date Preference")
             } footer: {
                 Text("Choose the date style for the news")
             }
