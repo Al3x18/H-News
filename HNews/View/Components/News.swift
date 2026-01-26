@@ -8,9 +8,11 @@
 import SwiftUI
 
 struct News: View {
-    @Binding var viewModel: NewsViewModel
+    @Bindable var viewModel: NewsViewModel
     @Binding var showWebView: Bool
     @Binding var selectedURL : URL?
+    
+    @Environment(\.openURL) var openURL
     
     @State private var showNoURLError = false
     
@@ -23,6 +25,13 @@ struct News: View {
                     showWebView = true
                 } else {
                     showNoURLError = true
+                }
+            }
+            .contextMenu {
+                Button("Open in Browser", systemImage: "square.and.arrow.up") {
+                    if let urlString = news.url, let url = URL(string: urlString) {
+                        openURL(url)
+                    }
                 }
             }
             .listRowSeparator(.hidden)
