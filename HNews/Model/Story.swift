@@ -22,7 +22,7 @@ struct newStoriesID: Codable {
     var storyID: Int
 }
 
-/*
+/* API Response Example
 {
     "by": "dorianmariecom",
     "descendants": 0,
