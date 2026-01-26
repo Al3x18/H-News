@@ -22,12 +22,12 @@ struct HNews: View {
                         .background(settingsViewModel.effectiveBackgroundColor)
                 } else if let error = newsViewModel.errorMessage {
                     //MARK: - Error View
-                    Error(error: error, newsViewModel: $newsViewModel)
+                    Error(error: error, newsViewModel: newsViewModel)
                         .background(settingsViewModel.effectiveBackgroundColor)
                 } else {
                     //MARK: - News List View
                     News(
-                        viewModel: $newsViewModel,
+                        viewModel: newsViewModel,
                         showWebView: $showWebView,
                         selectedURL: $selectedURL
                     )
