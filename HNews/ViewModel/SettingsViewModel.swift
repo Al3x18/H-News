@@ -38,6 +38,7 @@ final class SettingsViewModel {
         backgroundEnabled ? backgroundColor : Color(uiColor: .systemBackground)
     }
     
+    //MARK: - Init
     init() {
         // Load saved settings from UserDefaults
         if UserDefaults.standard.object(forKey: "entersReaderIfAvailable") != nil {
