@@ -9,7 +9,7 @@ import SwiftUI
 
 struct Error: View {
     var error: String
-    @Binding var newsViewModel: NewsViewModel
+    @Bindable var newsViewModel: NewsViewModel
     
     var body: some View {
         VStack {
