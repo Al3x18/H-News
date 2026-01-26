@@ -11,13 +11,17 @@ import SwiftUI
 @MainActor
 @Observable
 final class SettingsViewModel {
+    // We can't use '@AppStorage' in this class because '@Observable' and '@AppStorage' are not supported together
+    // so for persistence we use 'UserDefaults' and 'didSet'
+    
+    private static let defaultColor: Color = Color(uiColor: .systemBackground)
+    
     var backgroundEnabled: Bool = false {
         didSet {
             UserDefaults.standard.set(backgroundEnabled, forKey: "backgroundEnabled")
         }
     }
     
-    // Safari View Settings
     var entersReaderIfAvailable: Bool = true {
         didSet {
             UserDefaults.standard.set(entersReaderIfAvailable, forKey: "entersReaderIfAvailable")
@@ -25,7 +29,9 @@ final class SettingsViewModel {
     }
     
     // Background Color Settings
-    var backgroundColor: Color = .orange {
+    /// This is a custom persistence
+    /// with old method 'UserDeaults' and an extension on 'UserDefaults' to support color
+    var backgroundColor: Color = SettingsViewModel.defaultColor {
         didSet {
             if backgroundEnabled {
                 UserDefaults.standard.set(backgroundColor, forKey: "backgroundColor")
@@ -35,34 +41,18 @@ final class SettingsViewModel {
     
     // Computed property for the actual background color to use
     var effectiveBackgroundColor: Color {
-        backgroundEnabled ? backgroundColor : Color(uiColor: .systemBackground)
+        backgroundEnabled ? backgroundColor : SettingsViewModel.defaultColor
     }
     
     //MARK: - Init
     init() {
-        // Load saved settings from UserDefaults
-        if UserDefaults.standard.object(forKey: "entersReaderIfAvailable") != nil {
-            entersReaderIfAvailable = UserDefaults.standard.bool(forKey: "entersReaderIfAvailable")
-        } else {
-            entersReaderIfAvailable = true
-        }
-        
-        // Load backgroundEnabled
-        if UserDefaults.standard.object(forKey: "backgroundEnabled") != nil {
-            backgroundEnabled = UserDefaults.standard.bool(forKey: "backgroundEnabled")
-        } else {
-            backgroundEnabled = false
-        }
+        // Load saved values
+        backgroundEnabled = UserDefaults.standard.bool(forKey: "backgroundEnabled")
+        entersReaderIfAvailable = UserDefaults.standard.bool(forKey: "entersReaderIfAvailable")
         
         // Load saved color or use default
         if let savedColor = UserDefaults.standard.color(forKey: "backgroundColor") {
             backgroundColor = savedColor
-        } else {
-            // Set default color
-            backgroundColor = .orange
-            if backgroundEnabled {
-                UserDefaults.standard.set(backgroundColor, forKey: "backgroundColor")
-            }
         }
     }
 }
