@@ -9,8 +9,7 @@ import Foundation
 
 struct APIService {
     func fetchNewStories() async throws -> [newStoriesID] {
-        guard let url = URL(string: "https://hacker-news.firebaseio.com/v0/newstories.json?print=pretty") else { throw URLError(.badURL)
-        }
+        guard let url = URL(string: "https://hacker-news.firebaseio.com/v0/newstories.json?print=pretty") else { throw URLError(.badURL) }
         
         let (data, _) = try await URLSession.shared.data(from: url)
         
