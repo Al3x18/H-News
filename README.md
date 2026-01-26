@@ -34,9 +34,9 @@ HNews/
 
 ## Requirements
 
-- iOS 15.0+ / macOS 12.0+
-- Xcode 14.0+
-- Swift 5.7+
+- iOS 26.0+ / macOS 26.0+
+- Xcode 26.0+
+- Swift 5+
 
 ## API
 
