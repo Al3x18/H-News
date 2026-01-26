@@ -7,11 +7,16 @@
 
 import SwiftUI
 
+// MARK: - URL Item for Sheet
+struct URLItem: Identifiable {
+    let id = UUID()
+    let url: URL
+}
+
 struct HNews: View {
     @State private var settingsViewModel = SettingsViewModel()
     @State private var newsViewModel = NewsViewModel()
-    @State private var showWebView = false
-    @State private var selectedURL: URL? = nil
+    @State private var selectedURLItem: URLItem? = nil
     
     var body: some View {
         NavigationStack {
@@ -28,15 +33,13 @@ struct HNews: View {
                     //MARK: - News List View
                     News(
                         viewModel: newsViewModel,
-                        showWebView: $showWebView,
-                        selectedURL: $selectedURL
+                        selectedURLItem: $selectedURLItem,
+                        accentColor: settingsViewModel.accentColor
                     )
                     .listStyle(.plain)
                     .background(settingsViewModel.effectiveBackgroundColor)
-                    .sheet(isPresented: $showWebView) {
-                        if let url = selectedURL {
-                            SafariView(url: url, settingsViewModel: settingsViewModel)
-                        }
+                    .sheet(item: $selectedURLItem) { item in
+                        SafariView(url: item.url, settingsViewModel: settingsViewModel)
                     }
                 }
             }
@@ -48,7 +51,7 @@ struct HNews: View {
                             .font(.system(size: 20, weight: .semibold))
                             .foregroundStyle(
                                 LinearGradient(
-                                    colors: [Color.accentColor, Color.accentColor.opacity(0.7)],
+                                    colors: [settingsViewModel.accentColor, settingsViewModel.accentColor.opacity(0.7)],
                                     startPoint: .topLeading,
                                     endPoint: .bottomTrailing
                                 )
