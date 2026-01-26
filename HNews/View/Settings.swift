@@ -32,6 +32,8 @@ struct SettingsView: View {
             }
             
             Section {
+                ColorPicker("Accent Color", selection: $settingsViewModel.accentColor, supportsOpacity: false)
+                
                 Toggle("Custom Background Color", isOn: $settingsViewModel.backgroundEnabled)
                 
                 if settingsViewModel.backgroundEnabled {
@@ -42,8 +44,8 @@ struct SettingsView: View {
             } footer: {
                 Text(
                     settingsViewModel.backgroundEnabled
-                    ? "Choose the background color for the app"
-                    : "Enable custom background color to change the app background"
+                    ? "Choose the accent and background colors for the app"
+                    : "Choose the accent color and enable custom background color to change the app background"
                 )
             }
             
