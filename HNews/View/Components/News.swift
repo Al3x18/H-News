@@ -8,21 +8,21 @@
 import SwiftUI
 
 struct News: View {
-    @Bindable var viewModel: NewsViewModel
-    @Binding var showWebView: Bool
-    @Binding var selectedURL : URL?
-    
     @Environment(\.openURL) var openURL
+    
+    @Bindable var viewModel: NewsViewModel
+    @Binding var selectedURLItem: URLItem?
     
     @State private var showNoURLError = false
     
+    let accentColor: Color
+    
     var body: some View {
         List(viewModel.stories) { news in
-            NewsCard(news: news, viewModel: viewModel) {
+            NewsCard(news: news, viewModel: viewModel, accentColor: accentColor) {
                 print("DEBUG, tap on url: \(news.url ?? "NO_URL")")
                 if let urlString = news.url, let url = URL(string: urlString) {
-                    selectedURL = url
-                    showWebView = true
+                    selectedURLItem = URLItem(url: url)
                 } else {
                     showNoURLError = true
                 }
@@ -50,6 +50,7 @@ struct News: View {
 struct NewsCard: View {
     let news: Story
     let viewModel: NewsViewModel
+    let accentColor: Color
     let action: () -> Void
     
     var body: some View {
@@ -73,12 +74,12 @@ struct NewsCard: View {
                     // Type badge
                     Text(news.type.uppercased())
                         .font(.system(size: 10, weight: .semibold, design: .rounded))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(accentColor.opacity(0.8).contrastingTextColor)
                         .padding(.horizontal, 8)
                         .padding(.vertical, 4)
                         .background(
                             Capsule()
-                                .fill(Color.accentColor.opacity(0.8))
+                                .fill(accentColor.opacity(0.8))
                         )
                 }
                 
@@ -135,5 +136,32 @@ struct ScaleButtonStyle: ButtonStyle {
         configuration.label
             .scaleEffect(configuration.isPressed ? 0.97 : 1.0)
             .animation(.spring(response: 0.3, dampingFraction: 0.7), value: configuration.isPressed)
+    }
+}
+
+// MARK: - Color Extension for Contrasting Text
+extension Color {
+    var contrastingTextColor: Color {
+        let uiColor = UIColor(self)
+        
+        // Convert to RGB color space
+        guard let rgbColor = uiColor.cgColor.converted(to: CGColorSpaceCreateDeviceRGB(), intent: .defaultIntent, options: nil),
+              let components = rgbColor.components,
+              components.count >= 3 else {
+            // Fallback: assume dark background, use white text
+            return .white
+        }
+        
+        let red = components[0]
+        let green = components[1]
+        let blue = components[2]
+        
+        // Calculate relative luminance using the formula from WCAG
+        // L = 0.2126 * R + 0.7152 * G + 0.0722 * B
+        let luminance = 0.2126 * red + 0.7152 * green + 0.0722 * blue
+        
+        // If luminance is greater than 0.5, the color is light, use black text
+        // Otherwise, use white text
+        return luminance > 0.5 ? .black : .white
     }
 }
