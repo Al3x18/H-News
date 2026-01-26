@@ -11,12 +11,14 @@ import SwiftUI
 struct SettingsView: View {
     @Bindable var settingsViewModel: SettingsViewModel
     @Bindable var newsViewModel: NewsViewModel
-    @State private var localBackgroundColor: Color
     
-    init(settingsViewModel: SettingsViewModel, newsViewModel: NewsViewModel) {
-        self.settingsViewModel = settingsViewModel
-        self.newsViewModel = newsViewModel
-        _localBackgroundColor = State(initialValue: settingsViewModel.backgroundColor)
+    
+    private var appVersion: String {
+        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown"
+    }
+    
+    private var buildNumber: String {
+        Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "Unknown"
     }
     
     var body: some View {
@@ -56,12 +58,30 @@ struct SettingsView: View {
             } footer: {
                 Text("Choose the date style for the news")
             }
+            
+            Section {
+                Picker("News to load", selection: $newsViewModel.loadLimit) {
+                    ForEach(1...100, id: \.self) {
+                        Text("\($0)").tag($0)
+                    }
+                }
+            } header: {
+                Text("Load Limit")
+            } footer: {
+                Text("Select the number of the news to load")
+            }
+            
+            Section {
+                HStack {
+                    Text("Version")
+                    Spacer()
+                    Text("\(appVersion) (\(buildNumber))")
+                        .foregroundStyle(.secondary)
+                }
+            }
         }
         .navigationTitle("Settings")
-        .navigationBarTitleDisplayMode(.inline)
-        .onChange(of: settingsViewModel.backgroundColor) { oldValue, newValue in
-            localBackgroundColor = newValue
-        }
+        .navigationBarTitleDisplayMode(.automatic)
     }
 }
 
