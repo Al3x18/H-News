@@ -16,6 +16,7 @@ final class NewsViewModel {
     var isLoading: Bool = false
     var errorMessage: String?
     var dateLocale: DateLocale = .enUS
+    var loadLimit: Int = 40
     
     init() {
         Task {
@@ -29,7 +30,7 @@ final class NewsViewModel {
         do {
             let IDs = try await api.fetchNewStories()
             
-            for elem in IDs.prefix(50) {
+            for elem in IDs.prefix(loadLimit) {
                 do {
                     let story = try await api.fetchStory(id: elem.storyID)
                     stories.append(story)
