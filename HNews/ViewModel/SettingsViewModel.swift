@@ -15,6 +15,7 @@ final class SettingsViewModel {
     // so for persistence we use 'UserDefaults' and 'didSet'
     
     private static let defaultColor: Color = Color(uiColor: .systemBackground)
+    private static let defaultAccentColor: Color = Color(red: 0.0, green: 0.478, blue: 1.0) // iOS blue
     
     var backgroundEnabled: Bool = false {
         didSet {
@@ -44,6 +45,13 @@ final class SettingsViewModel {
         backgroundEnabled ? backgroundColor : SettingsViewModel.defaultColor
     }
     
+    // Accent Color Settings
+    var accentColor: Color = SettingsViewModel.defaultAccentColor {
+        didSet {
+            UserDefaults.standard.set(accentColor, forKey: "accentColor")
+        }
+    }
+    
     //MARK: - Init
     init() {
         // Load saved values
@@ -53,6 +61,11 @@ final class SettingsViewModel {
         // Load saved color or use default
         if let savedColor = UserDefaults.standard.color(forKey: "backgroundColor") {
             backgroundColor = savedColor
+        }
+        
+        // Load saved accent color or use default
+        if let savedAccentColor = UserDefaults.standard.color(forKey: "accentColor") {
+            accentColor = savedAccentColor
         }
     }
 }
