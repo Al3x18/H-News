@@ -6,10 +6,19 @@
 //
 
 import SwiftUI
+import SwiftData
+
+enum NewsType {
+    case all
+    case favorites
+}
 
 struct News: View {
     @Environment(\.openURL) var openURL
-    
+    @Environment(\.modelContext) private var modelContext
+
+    var type: NewsType
+    var isFavView: Bool = false
     @Bindable var viewModel: NewsViewModel
     @Binding var selectedURLItem: URLItem?
     
@@ -18,30 +27,60 @@ struct News: View {
     let accentColor: Color
     
     var body: some View {
-        List(viewModel.stories) { news in
-            NewsCard(news: news, viewModel: viewModel, accentColor: accentColor) {
-                print("DEBUG, tap on url: \(news.url ?? "NO_URL")")
-                if let urlString = news.url, let url = URL(string: urlString) {
-                    selectedURLItem = URLItem(url: url)
-                } else {
-                    showNoURLError = true
-                }
-            }
-            .contextMenu {
-                Button("Open in Browser", systemImage: "square.and.arrow.up") {
+        if viewModel.stories.isEmpty {
+            Text("No news available")
+                .font(.system(size: 20))
+                .fontWeight(.bold)
+        } else if viewModel.favoriteStories.isEmpty, isFavView {
+            Text("No favorites news available")
+                .font(.system(size: 20))
+                .fontWeight(.bold)
+        } else {
+            List(type == .all ? viewModel.stories : viewModel.favoriteStories) { news in
+                NewsCard(news: news, viewModel: viewModel, accentColor: accentColor) {
+                    print("DEBUG, tap on url: \(news.url ?? "NO_URL")")
                     if let urlString = news.url, let url = URL(string: urlString) {
-                        openURL(url)
+                        selectedURLItem = URLItem(url: url)
+                    } else {
+                        showNoURLError = true
                     }
                 }
+                .contextMenu {
+                    openInBrowser(for: news)
+                    if !isFavView { saveInFavorites(for: news) }
+                    if isFavView { removeFromFavorites(for: news) }
+                }
+                .listRowSeparator(.hidden)
+                .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                .listRowBackground(Color.clear)
             }
-            .listRowSeparator(.hidden)
-            .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
-            .listRowBackground(Color.clear)
+            .alert("No URL Available", isPresented: $showNoURLError) {
+                Button("OK", role: .cancel) { }
+            } message: {
+                Text("This news doesn't have a URL available.")
+            }
         }
-        .alert("No URL Available", isPresented: $showNoURLError) {
-            Button("OK", role: .cancel) { }
-        } message: {
-            Text("This news doesn't have a URL available.")
+    }
+    
+    func openInBrowser(for news: Story) -> some View {
+        Button("Open in Browser", systemImage: "square.and.arrow.up") {
+            if let urlString = news.url, let url = URL(string: urlString) {
+                openURL(url)
+            }
+        }
+    }
+    
+    func saveInFavorites(for news: Story) -> some View {
+        Button("Save to Favorites", systemImage: "star.fill") {
+            viewModel.saveStoryInFavorites(story: news, context: modelContext)
+        }
+    }
+
+    func removeFromFavorites(for news: Story) -> some View {
+        Button("Remove from Favorites", systemImage: "star") {
+            withAnimation(.easeInOut(duration: 0.3)) {
+                viewModel.removeFromFavorites(story: news, context: modelContext)
+            }
         }
     }
 }
