@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Story: Codable, Identifiable {
+struct Story: Codable, Identifiable, Equatable {
     var by: String
     var descendants: Int
     var id: Int
