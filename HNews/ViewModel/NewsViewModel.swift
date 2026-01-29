@@ -7,16 +7,15 @@
 
 import Foundation
 import SwiftUI
+import SwiftData
 
 @MainActor
 @Observable
 final class NewsViewModel {
-    // We can't use '@AppStorage' in this class because '@Observable' and '@AppStorage' are not supported together
-    // so for persistence we use 'UserDefaults' and 'didSet'
-    
     private let api = APIService()
-    
+
     var stories: [Story] = []
+    var favoriteStories: [Story] = []
     var isLoading: Bool = false
     var errorMessage: String?
     
@@ -91,13 +90,37 @@ final class NewsViewModel {
             }
             
             stories = loadedStories
-            
+
         } catch {
             errorMessage = "Failed to fetch stories"
             print("loadNewStories error: \(error)")
         }
         
         isLoading = false
+    }
+    
+    func loadFavorites(from context: ModelContext) {
+        let descriptor = FetchDescriptor<FavoriteStory>(sortBy: [SortDescriptor(\.savedAt, order: .reverse)])
+        guard let saved = try? context.fetch(descriptor) else { return }
+        favoriteStories = saved.map { $0.toStory() }
+    }
+
+    func saveStoryInFavorites(story: Story, context: ModelContext) {
+        let id = story.id
+        let exists = (try? context.fetch(FetchDescriptor<FavoriteStory>(predicate: #Predicate { $0.storyId == id })))?.isEmpty == false
+        guard !exists else { return }
+        context.insert(FavoriteStory(from: story))
+        try? context.save()
+        favoriteStories.insert(story, at: 0)
+    }
+
+    func removeFromFavorites(story: Story, context: ModelContext) {
+        let id = story.id
+        let descriptor = FetchDescriptor<FavoriteStory>(predicate: #Predicate { $0.storyId == id })
+        guard let matches = try? context.fetch(descriptor) else { return }
+        for match in matches { context.delete(match) }
+        try? context.save()
+        favoriteStories.removeAll { $0.id == story.id }
     }
     
     /// Converts a Unix timestamp to a formatted date string
