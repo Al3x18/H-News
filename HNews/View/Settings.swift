@@ -25,8 +25,6 @@ struct SettingsView: View {
         List {
             Section {
                 Toggle("Reader Mode", isOn: $settingsViewModel.entersReaderIfAvailable)
-            } header: {
-                Text("Safari View")
             } footer: {
                 Text("Enable reader mode automatically when available in Safari view")
             }
@@ -39,8 +37,6 @@ struct SettingsView: View {
                 if settingsViewModel.backgroundEnabled {
                     ColorPicker("Background Color", selection: $settingsViewModel.backgroundColor, supportsOpacity: false)
                 }
-            } header: {
-                Text("Appearance")
             } footer: {
                 Text(
                     settingsViewModel.backgroundEnabled
@@ -55,8 +51,6 @@ struct SettingsView: View {
                         Text(param.localeForPicker).tag(param)
                     }
                 }
-            } header: {
-                Text("Date Preference")
             } footer: {
                 Text("Choose the date style for the news")
             }
@@ -67,8 +61,6 @@ struct SettingsView: View {
                         Text("\($0)").tag($0)
                     }
                 }
-            } header: {
-                Text("Load Limit")
             } footer: {
                 Text("Select the number of the news to load")
             }
