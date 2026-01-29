@@ -8,11 +8,22 @@
 import SwiftUI
 
 struct FavoritesView: View {
+    @Bindable var newsViewModel: NewsViewModel
+    @Binding var urlItem: URLItem?
+    var effectiveBackgroundColor: Color
+    var accentColor: Color
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        NavigationStack {
+            News(
+                type: .favorites,
+                isFavView: true, viewModel: newsViewModel,
+                selectedURLItem: $urlItem,
+                accentColor: accentColor
+            )
+            .listStyle(.plain)
+            .background(effectiveBackgroundColor)
+        }
+        .navigationTitle("Favorites")
     }
-}
-
-#Preview {
-    FavoritesView()
 }
