@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 // MARK: - URL Item for Sheet
 struct URLItem: Identifiable {
@@ -14,10 +15,11 @@ struct URLItem: Identifiable {
 }
 
 struct HNews: View {
+    @Environment(\.modelContext) private var modelContext
     @State private var settingsViewModel = SettingsViewModel()
     @State private var newsViewModel = NewsViewModel()
     @State private var selectedURLItem: URLItem? = nil
-    
+
     var body: some View {
         NavigationStack {
             Group {
@@ -32,6 +34,7 @@ struct HNews: View {
                 } else {
                     //MARK: - News List View
                     News(
+                        type: .all,
                         viewModel: newsViewModel,
                         selectedURLItem: $selectedURLItem,
                         accentColor: settingsViewModel.accentColor
@@ -44,8 +47,8 @@ struct HNews: View {
                 }
             }
             .toolbarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .principal) {
+            .toolbar(id: "main-toolbar") {
+                ToolbarItem(id: "title", placement: .title) {
                     HStack(spacing: 8) {
                         Image(systemName: "newspaper.fill")
                             .font(.system(size: 20, weight: .semibold))
@@ -56,12 +59,12 @@ struct HNews: View {
                                     endPoint: .bottomTrailing
                                 )
                             )
-                        Text("H News")
+                        Text("H-News")
                             .font(.system(size: 28, weight: .bold, design: .rounded))
                             .foregroundStyle(.primary)
                     }
                 }
-                ToolbarItem(placement: .topBarLeading) {
+                ToolbarItem(id: "loading-button", placement: .topBarLeading) {
                     Button {
                         Task { await loadNews() }
                     } label: {
@@ -72,7 +75,21 @@ struct HNews: View {
                     }
                     .disabled(newsViewModel.isLoading)
                 }
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItem(id: "fav-button", placement: .topBarTrailing) {
+                    NavigationLink {
+                        FavoritesView(
+                            newsViewModel: newsViewModel,
+                            urlItem: $selectedURLItem,
+                            effectiveBackgroundColor: settingsViewModel.effectiveBackgroundColor,
+                            accentColor: settingsViewModel.accentColor
+                        )
+                    } label: {
+                        Image(systemName: "star")
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundStyle(.primary)
+                    }
+                }
+                ToolbarItem(id: "settings-button", placement: .topBarTrailing) {
                     NavigationLink {
                         SettingsView(settingsViewModel: settingsViewModel, newsViewModel: newsViewModel)
                     } label: {
@@ -85,9 +102,12 @@ struct HNews: View {
             .refreshable {
                 Task { await loadNews() }
             }
+            .onAppear {
+                newsViewModel.loadFavorites(from: modelContext)
+            }
         }
     }
-    
+
     func loadNews() async {
         await newsViewModel.loadNewStories()
     }
