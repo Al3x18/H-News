@@ -99,6 +99,10 @@ final class NewsViewModel {
         isLoading = false
     }
     
+    func isFavorite(_ news: Story) -> Bool {
+        return favoriteStories.contains(news)
+    }
+    
     func loadFavorites(from context: ModelContext) {
         let descriptor = FetchDescriptor<FavoriteStory>(sortBy: [SortDescriptor(\.savedAt, order: .reverse)])
         guard let saved = try? context.fetch(descriptor) else { return }
