@@ -17,7 +17,8 @@ struct FavoritesView: View {
         NavigationStack {
             News(
                 type: .favorites,
-                isFavView: true, viewModel: newsViewModel,
+                isFavView: true,
+                viewModel: newsViewModel,
                 selectedURLItem: $urlItem,
                 accentColor: accentColor
             )
