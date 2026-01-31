@@ -72,7 +72,9 @@ struct News: View {
     
     func saveInFavorites(for news: Story) -> some View {
         Button("Save to Favorites", systemImage: "star.fill") {
-            viewModel.saveStoryInFavorites(story: news, context: modelContext)
+            withAnimation(.bouncy(duration: 0.35)) {
+                viewModel.saveStoryInFavorites(story: news, context: modelContext)
+            }
         }
     }
 
@@ -140,7 +142,16 @@ struct NewsCard: View {
                         .foregroundStyle(.secondary)
                     
                     Spacer()
-                    
+                    Image(systemName: "star.fill")
+                        .resizable()
+                        .frame(width: 10, height: 10)
+                        .foregroundStyle(.yellow)
+                        .opacity(viewModel.isFavorite(news) ? 1 : 0)
+                        .scaleEffect(viewModel.isFavorite(news) ? 1 : 0.3)
+                        .rotationEffect(.degrees(viewModel.isFavorite(news) ? 0 : -360))
+                        .frame(width: viewModel.isFavorite(news) ? 10 : 0, height: 10)
+                        .clipped()
+                        .animation(.bouncy(duration: 0.45), value: viewModel.isFavorite(news))
                     Image(systemName: "arrow.up.right.square.fill")
                         .font(.caption)
                         .foregroundStyle(.tertiary)
@@ -204,3 +215,4 @@ extension Color {
         return luminance > 0.5 ? .black : .white
     }
 }
+
